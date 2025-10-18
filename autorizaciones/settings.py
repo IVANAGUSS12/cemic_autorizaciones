@@ -1,17 +1,19 @@
 import os
 from pathlib import Path
+import dj_database_url
 
-# -------------------------
-# BASE / DEBUG / SECRET KEY
-# -------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "changeme")
+
+# ---------------------------------------------------------------------
+# Básico
+# ---------------------------------------------------------------------
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "change-me")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "*").split(",")]
 
-# -------------------------
-# APLICACIONES
-# -------------------------
+# ---------------------------------------------------------------------
+# Apps
+# ---------------------------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -19,8 +21,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # tus apps personalizadas
-    "backend",  # <-- reemplazá por el nombre real de tu app
+    # tu app real es "api" (NO "backend")
+    "api",
 ]
 
 MIDDLEWARE = [
@@ -53,26 +55,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "autorizaciones.wsgi.application"
 
-# -------------------------
-# BASE DE DATOS (DigitalOcean)
-# -------------------------
+# ---------------------------------------------------------------------
+# Base de datos (SOLO DATABASE_URL)
+# ---------------------------------------------------------------------
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "autorizaciones"),
-        "USER": os.getenv("DB_USER", "doadmin"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT", "25060"),
-        "OPTIONS": {
-            "sslmode": os.getenv("DB_SSLMODE", "require"),
-        },
-    }
+    "default": dj_database_url.config(
+        env="DATABASE_URL",
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
 
-# -------------------------
-# CONTRASEÑAS / AUTH
-# -------------------------
+# ---------------------------------------------------------------------
+# Passwords
+# ---------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -80,35 +76,21 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# -------------------------
-# INTERNACIONALIZACIÓN
-# -------------------------
+# ---------------------------------------------------------------------
+# i18n
+# ---------------------------------------------------------------------
 LANGUAGE_CODE = "es-ar"
 TIME_ZONE = "America/Argentina/Buenos_Aires"
 USE_I18N = True
 USE_TZ = True
 
-# -------------------------
-# ARCHIVOS ESTÁTICOS
-# -------------------------
+# ---------------------------------------------------------------------
+# Static / Media
+# ---------------------------------------------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# -------------------------
-# CORS / SEGURIDAD
-# -------------------------
-CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = [
-    "https://autorizaciones-954773928377.southamerica-east1.run.app",
-    "https://*.ondigitalocean.app",
-]
-
-# -------------------------
-# DEFAULT PRIMARY KEY FIELD TYPE
-# -------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
